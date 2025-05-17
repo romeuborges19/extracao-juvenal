@@ -1,0 +1,1 @@
+Extração do conjunto de dados montado e utilizado pelo artigo "Predicting Stock Price Falls Using News Data: Evidence from the Brazilian Market", implementado em Go. Esta ferramenta itera pelas notícias do dataset, extrai a data e o conteúdo de cada notícia e salva os dados num banco de dados.
