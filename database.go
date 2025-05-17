@@ -23,7 +23,7 @@ func OpenConn() (*sql.DB, error) {
 	dbPass := os.Getenv("DBPASS")
 
 	connStr := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		dbHost, dbPort, dbUser, dbPass, dbName,
 	)
 
