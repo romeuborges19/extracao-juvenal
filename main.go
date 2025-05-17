@@ -2,15 +2,25 @@ package main
 
 import (
 	"fmt"
+	"log"
 	s "main/service"
 	"os"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
-const datasetsPath = "/home/rborges/projetos/tcc/datasets/"
+func getRoot() string {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return os.Getenv("DATASET_ROOT")
+}
 
 func main() {
-	const newsRoot = datasetsPath + "news_db/"
+	newsRoot := getRoot() + "news_db/"
 
 	files, err := os.ReadDir(newsRoot)
 	if err != nil {
