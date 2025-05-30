@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -37,7 +38,7 @@ func readNewsContent(filePath string) string {
 	return content
 }
 
-func treatNewsFile(f os.DirEntry, dir string) *Article {
+func treatNewsFile(f os.DirEntry, dir string, source string) *Article {
 	newsFile := f.Name()
 
 	parts := strings.Split(newsFile, ".")
@@ -49,10 +50,10 @@ func treatNewsFile(f os.DirEntry, dir string) *Article {
 	dateStr = formatDateString(dateStr[:8])
 
 	content := readNewsContent(dir + newsFile)
-	return NewArticle(dateStr, content)
+	return NewArticle(dateStr, content, source)
 }
 
-func extractFolder(files []os.DirEntry, root string, db *sql.DB, wg *sync.WaitGroup) {
+func extractFolder(source string, files []os.DirEntry, root string, db *sql.DB, wg *sync.WaitGroup) {
 	for _, f := range files {
 		if f.IsDir() == false {
 			continue
@@ -67,19 +68,20 @@ func extractFolder(files []os.DirEntry, root string, db *sql.DB, wg *sync.WaitGr
 		}
 
 		for _, n := range news {
-			a := treatNewsFile(n, subDir)
+			a := treatNewsFile(n, subDir, source)
 			SaveArticle(a, db)
 		}
 	}
 	wg.Done()
+	fmt.Printf("Dados de %v extraídos com sucesso\n", source)
 }
 
 func CollectNews(files []os.DirEntry, root string, db *sql.DB) {
 	var wg sync.WaitGroup
 
 	for _, file := range files {
-		fName := file.Name()
-		subDir := root + fName + "/"
+		source := file.Name()
+		subDir := root + source + "/"
 
 		months, err := os.ReadDir(subDir)
 		if err != nil {
@@ -87,7 +89,7 @@ func CollectNews(files []os.DirEntry, root string, db *sql.DB) {
 		}
 
 		wg.Add(1)
-		go extractFolder(months, subDir, db, &wg)
+		go extractFolder(source, months, subDir, db, &wg)
 	}
 	wg.Wait()
 }
